@@ -56,7 +56,30 @@ database schema details, API error format, migration naming, and internal module
 granularity to milestone-specific planning. New decisions should be appended
 with rationale and date once agreed.
 
+## 2026-08-14 — Milestone 1 economic loop
+
+- Use immutable Pydantic domain models and `Decimal` arithmetic so engine
+  behavior is portable and deterministic.
+- Round quantities to four decimal places and prices to two, half-to-even, only
+  at state boundaries.
+- Allocate shared production inputs proportionally across all requesting
+  sectors. Sector mapping order must not affect output.
+- Keep annual resource demand fixed in scenario data until population-driven
+  demand is introduced in Milestone 2.
+- Treat construction output as reported activity during Milestone 1. It consumes
+  labor, energy, and capital goods but does not modify infrastructure or sector
+  capacity before Milestone 2.
+- Store full JSON state snapshots and causal reports for turn zero and every
+  completed turn.
+- Require clients to submit `expected_turn`; a stale request returns a conflict
+  and creates no snapshot.
+- Persist a completed turn and campaign pointer update in one database
+  transaction.
+- Keep timestamps as audit metadata only. They never enter engine input.
+- Use a checked-in golden-seed fixture containing reviewed SHA-256 digests of
+  canonical state and report JSON. Fixture changes require explicit formula or
+  balance review.
+
 ## Source
 
 [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15), retrieved 2026-08-13.
-

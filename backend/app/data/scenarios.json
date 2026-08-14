@@ -1,0 +1,21 @@
+{
+  "agrarian_start": {
+    "turn": 0,
+    "available_labor": "100",
+    "resources": {
+      "food": {"inventory": "120", "demand": "100", "price": "1.00", "world_price": "1.00", "strategic_reserve_target": "50"},
+      "timber": {"inventory": "80", "demand": "15", "price": "2.00", "world_price": "2.00", "strategic_reserve_target": "30"},
+      "ore": {"inventory": "50", "demand": "10", "price": "3.00", "world_price": "3.00", "strategic_reserve_target": "20"},
+      "energy": {"inventory": "60", "demand": "25", "price": "2.50", "world_price": "2.50", "strategic_reserve_target": "25"},
+      "consumer_goods": {"inventory": "30", "demand": "35", "price": "4.00", "world_price": "4.00", "strategic_reserve_target": "15"},
+      "capital_goods": {"inventory": "25", "demand": "10", "price": "6.00", "world_price": "6.00", "strategic_reserve_target": "10"}
+    },
+    "sectors": {
+      "agriculture": {"assigned_labor": "45", "capacity": "100", "productivity": "1.8", "input_coefficients": {"energy": "0.10"}, "output_mix": {"food": "1"}, "wage": "1", "maintenance_requirement": "2", "pollution_intensity": "0.05"},
+      "extraction": {"assigned_labor": "15", "capacity": "40", "productivity": "1.5", "input_coefficients": {"energy": "0.20"}, "output_mix": {"timber": "0.60", "ore": "0.40"}, "wage": "1.2", "maintenance_requirement": "2", "pollution_intensity": "0.30"},
+      "manufacturing": {"assigned_labor": "20", "capacity": "35", "productivity": "1.2", "input_coefficients": {"ore": "0.30", "timber": "0.20", "energy": "0.25"}, "output_mix": {"consumer_goods": "0.65", "capital_goods": "0.35"}, "wage": "1.5", "maintenance_requirement": "3", "pollution_intensity": "0.25"},
+      "construction": {"assigned_labor": "5", "capacity": "15", "productivity": "0.8", "input_coefficients": {"capital_goods": "0.50", "energy": "0.20"}, "output_mix": {}, "wage": "1.4", "maintenance_requirement": "1", "pollution_intensity": "0.15"},
+      "energy": {"assigned_labor": "10", "capacity": "30", "productivity": "1.5", "input_coefficients": {"timber": "0.20"}, "output_mix": {"energy": "1"}, "wage": "1.3", "maintenance_requirement": "2", "pollution_intensity": "0.35"}
+    }
+  }
+}

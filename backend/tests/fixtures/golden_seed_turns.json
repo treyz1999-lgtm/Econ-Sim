@@ -1,0 +1,45 @@
+{
+  "scenario_id": "agrarian_start",
+  "campaign_id": "00000000-0000-0000-0000-000000000001",
+  "seed": 42,
+  "actions": [
+    {
+      "agriculture": "45",
+      "extraction": "15",
+      "manufacturing": "20",
+      "construction": "5",
+      "energy": "10"
+    },
+    {
+      "agriculture": "50",
+      "extraction": "12",
+      "manufacturing": "18",
+      "construction": "5",
+      "energy": "10"
+    },
+    {
+      "agriculture": "40",
+      "extraction": "20",
+      "manufacturing": "20",
+      "construction": "8",
+      "energy": "12"
+    }
+  ],
+  "expected": [
+    {
+      "turn": 1,
+      "state_sha256": "47458425c37087bb900a70d7c41b0c6ab0c4c974dd17e024f81088f5f3666a8a",
+      "report_sha256": "bb1b0981a74385d78d6437544a632094841e98ac4a363b22a08e901416037ab2"
+    },
+    {
+      "turn": 2,
+      "state_sha256": "33e66d3e06715d3fdb607f533ac33aa7cc58b753387ea6760cf5b0a0430037f7",
+      "report_sha256": "20beb071f9e688c6fc109983d06fc56beaeff5b74280d3a508c3c16dca81660c"
+    },
+    {
+      "turn": 3,
+      "state_sha256": "dbbeb14456c4ab11c105dabc50db2b3e3627cc81ddac4fd6a3f568a82d458522",
+      "report_sha256": "a0f3a31d9efd7833582d4e3dadc0b2d45ced3a8c63b9da149712128a54717504"
+    }
+  ]
+}

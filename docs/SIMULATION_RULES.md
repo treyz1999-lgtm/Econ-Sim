@@ -168,5 +168,61 @@ three leading structural causes.
 - Simulation behavior never depends on wall-clock time.
 - Formulas with unstable ranges are validated or clamped.
 
-Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)
+## Milestone 1 formula specification
 
+Milestone 1 uses `Decimal` arithmetic. Resource quantities and annual sector
+output are rounded half-to-even to four decimal places at state boundaries;
+prices are rounded half-to-even to two decimal places. Intermediate
+calculations are not rounded.
+
+Production units are:
+
+- Labor: worker-equivalents.
+- Productivity: output units per worker-equivalent per year.
+- Capacity: output units per year.
+- Input coefficient: resource units consumed per output unit.
+
+```text
+labor_output = assigned_labor * productivity
+potential_output = min(labor_output, capacity)
+```
+
+When sectors share an input, each receives the same proportional fulfillment
+factor. This prevents sector iteration order from changing results:
+
+```text
+requested_input = sum(sector_potential_output * sector_input_coefficient)
+input_scale = min(1, available_input / requested_input)
+sector_output = potential_output * min(required_input_scales)
+```
+
+Inputs are removed before outputs are added. Output mixes divide sector output
+among resources and must sum to one. Construction is the sole Milestone 1
+exception: it reports construction activity but does not create a seventh
+resource or change capacity before Milestone 2.
+
+Scenario demand is fixed during Milestone 1. Population-driven demand begins in
+Milestone 2.
+
+```text
+consumption = min(available_supply, demand)
+ending_inventory = available_supply - consumption
+shortage_ratio = max(0, demand - available_supply) / max(demand, 1)
+```
+
+For zero demand, shortage ratio is zero. Milestone 1 price pressure is:
+
+```text
+shortage_pressure = shortage_ratio * shortage_pressure_coefficient
+import_pressure = 0
+surplus_ratio = max(0, ending_inventory - reserve_target) / max(demand, 1)
+surplus_pressure = min(surplus_pressure_cap,
+                       surplus_ratio * surplus_pressure_coefficient)
+price_multiplier = clamp(0.75, 1.50,
+                         1 + shortage_pressure - surplus_pressure)
+new_price = old_price * price_multiplier
+```
+
+All coefficients and initial values are stored in backend JSON data files.
+
+Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)

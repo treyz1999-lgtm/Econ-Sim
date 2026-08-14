@@ -1,0 +1,8 @@
+{
+  "shortage_pressure_coefficient": "0.60",
+  "surplus_pressure_coefficient": "0.10",
+  "surplus_pressure_cap": "0.25",
+  "price_multiplier_floor": "0.75",
+  "price_multiplier_ceiling": "1.50",
+  "shortage_warning_threshold": "0.10"
+}
