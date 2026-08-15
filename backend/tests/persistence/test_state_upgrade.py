@@ -29,6 +29,8 @@ def test_milestone_one_state_is_upgraded_deterministically(
     with session_factory() as session:
         upgraded = get_campaign_state(session, campaign_id)
 
-    assert upgraded.schema_version == 2
+    assert upgraded.schema_version == 3
     assert upgraded.population == state.population
     assert upgraded.government == state.government
+    assert upgraded.policies == state.policies
+    assert upgraded.politics == state.politics

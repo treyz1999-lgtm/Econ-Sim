@@ -51,4 +51,4 @@ def test_report_reconciles_with_resulting_state() -> None:
     for resource_id, result in report.resources.items():
         assert result.ending_inventory == next_state.resources[resource_id].inventory
         assert result.new_price == next_state.resources[resource_id].price
-    assert len(report.explanations) == 13
+    assert len(report.explanations) == 15

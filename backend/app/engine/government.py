@@ -39,6 +39,7 @@ def resolve_government(
     sector_results: dict[SectorId, SectorTurnResult],
     balance: BalanceConfig,
 ) -> GovernmentResolution:
+    """Resolve incomes, taxes, spending, borrowing, and capacity for one turn."""
     if actions.new_foreign_borrowing > balance.foreign_borrowing_limit:
         raise ForeignBorrowingError("foreign borrowing exceeds per-turn limit")
     incomes = {group_id: Decimal(0) for group_id in PopulationGroupId}
@@ -64,6 +65,18 @@ def resolve_government(
     overall_balance = primary_balance - debt_service + actions.new_foreign_borrowing
     domestic_borrowing = max(Decimal(0), -overall_balance - government.treasury)
     treasury = max(Decimal(0), government.treasury + overall_balance)
+    administration_coverage = min(
+        Decimal(1),
+        actions.spending[SpendingCategory.ADMINISTRATION]
+        / max(population.total * Decimal("0.05"), Decimal(1)),
+    )
+    administrative_capacity = min(
+        Decimal(1),
+        government.administrative_capacity
+        + balance.administrative_capacity_gain_rate
+        * administration_coverage
+        * (Decimal(1) - government.administrative_capacity),
+    )
 
     welfare = actions.spending[SpendingCategory.WELFARE]
     updated_groups: dict[PopulationGroupId, PopulationGroupState] = {}
@@ -100,6 +113,7 @@ def resolve_government(
                     government.foreign_reserves + actions.new_foreign_borrowing
                 ),
                 "debt_service": debt_service,
+                "administrative_capacity": quantize_quantity(administrative_capacity),
             }
         ),
         population=population.model_copy(update={"groups": updated_groups}),

@@ -3,12 +3,16 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.app.domain.government import SpendingCategory
+from backend.app.domain.policies import PolicyDimension
+from backend.app.domain.politics import StrainComponents, WarningLevel
 from backend.app.domain.population import AgeCohortId
 from backend.app.domain.production import SectorId
 from backend.app.domain.resources import ResourceId
 
 
 class Cause(BaseModel):
+    """Describe one numeric contributor to a reported metric change."""
+
     model_config = ConfigDict(frozen=True)
 
     code: str
@@ -17,6 +21,8 @@ class Cause(BaseModel):
 
 
 class MetricExplanation(BaseModel):
+    """Group causal contributions under the metric they explain."""
+
     model_config = ConfigDict(frozen=True)
 
     metric: str
@@ -73,9 +79,36 @@ class GovernmentTurnResult(BaseModel):
     infrastructure: Decimal = Field(ge=0, allow_inf_nan=False)
     infrastructure_depreciation: Decimal = Field(ge=0, allow_inf_nan=False)
     infrastructure_added: Decimal = Field(ge=0, allow_inf_nan=False)
+    legitimacy: Decimal = Field(ge=0, le=1, allow_inf_nan=False)
+    administrative_capacity: Decimal = Field(ge=0, le=1, allow_inf_nan=False)
+
+
+class PolicyTurnResult(BaseModel):
+    """Summarize policy adoption, activation, and resulting institutions."""
+
+    model_config = ConfigDict(frozen=True)
+
+    adopted_policy: str | None
+    activated_policy: str | None
+    active: dict[PolicyDimension, str]
+
+
+class PoliticsTurnResult(BaseModel):
+    """Expose aggregate political pressure and its normalized components."""
+
+    model_config = ConfigDict(frozen=True)
+
+    systemic_strain: Decimal = Field(ge=0, le=1)
+    warning_level: WarningLevel
+    polarization: Decimal = Field(ge=0, le=1)
+    resilience: Decimal = Field(ge=0, le=1)
+    environmental_damage: Decimal = Field(ge=0, le=1)
+    components: StrainComponents
 
 
 class TurnReport(BaseModel):
+    """Return reconciled economic, demographic, government, and political results."""
+
     model_config = ConfigDict(frozen=True)
 
     previous_turn: int = Field(ge=0)
@@ -88,5 +121,7 @@ class TurnReport(BaseModel):
     resources: dict[ResourceId, ResourceTurnResult]
     population: PopulationTurnResult
     government: GovernmentTurnResult
+    policy: PolicyTurnResult
+    politics: PoliticsTurnResult
     warnings: tuple[str, ...]
     explanations: tuple[MetricExplanation, ...]

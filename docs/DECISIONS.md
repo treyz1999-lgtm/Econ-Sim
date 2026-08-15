@@ -101,6 +101,23 @@ with rationale and date once agreed.
 - Continue storing population and government inside atomic JSON turn snapshots;
   no relational schema migration is needed.
 
+## 2026-08-15 — Milestone 3 institutions and politics
+
+- Represent all seven documented dimensions as seven starting institutions and
+  fourteen adoptable alternatives in a validated data catalog.
+- Resolve policy adoption only in the atomic end-turn action. The catalog
+  endpoint is read-only and returns explicit eligibility blockers.
+- Charge implementation cost and group reactions on adoption; activate lasting
+  effects only on the configured deterministic activation turn.
+- Keep political state separate from demographic state while using the same
+  four stable population-group identifiers.
+- Normalize political metrics, legitimacy, resilience, environmental damage,
+  and systemic strain to `[0, 1]`.
+- Critical strain emits warnings only. Crises and terminal countdowns remain
+  Milestone 5 work, and foreign dependence remains zero until Milestone 4.
+- Version game state as schema 3. Older snapshots receive deterministic policy
+  and politics baselines without a relational database migration.
+
 ## Source
 
 [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15), retrieved 2026-08-13.

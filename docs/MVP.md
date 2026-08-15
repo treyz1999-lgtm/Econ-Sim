@@ -98,6 +98,10 @@ taxation, build manufacturing capacity, and manage development's social costs.
 - Policy adoption, satisfaction, influence, organization, radicalization,
   legitimacy, systemic strain, and warnings.
 
+Milestone 3 backend scope includes policy/politics state, atomic policy actions,
+catalog eligibility, delayed effects, causal reports, and deterministic tests.
+Policy and politics UI remains outside the current backend-only scope.
+
 ### Milestone 4 — Trade and foreign nations
 
 - Three foreign actors, trade, world prices, reserves, relationships, and
@@ -134,4 +138,3 @@ taxation, build manufacturing capacity, and manage development's social costs.
 - Strong short-term optimization should increase long-term fragility.
 
 Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)
-

@@ -44,5 +44,19 @@
   "infrastructure_depreciation_rate": "0.05",
   "construction_cost_per_unit": "1.00",
   "infrastructure_conversion": "1.00",
-  "sector_capacity_conversion": "0.50"
+  "sector_capacity_conversion": "0.50",
+  "administrative_capacity_gain_rate": "0.08",
+  "satisfaction_adjustment_rate": "0.30",
+  "expectation_gain_rate": "0.18",
+  "expectation_loss_rate": "0.06",
+  "organization_gain_rate": "0.12",
+  "organization_decay_rate": "0.025",
+  "radicalization_gain_rate": "0.10",
+  "radicalization_recovery_rate": "0.025",
+  "grievance_threshold": "0.45",
+  "legitimacy_adjustment_rate": "0.20",
+  "environmental_damage_rate": "0.001",
+  "environmental_recovery_rate": "0.015",
+  "strain_warning_thresholds": {"elevated":"0.45","severe":"0.65","critical":"0.80"},
+  "strain_weights": {"resource_stress":"0.15","demographic_stress":"0.08","inequality":"0.10","unmet_expectations":"0.14","infrastructure_burden":"0.10","debt_pressure":"0.10","environmental_damage":"0.10","foreign_dependence":"0.00","institutional_complexity":"0.10","political_polarization":"0.13"}
 }

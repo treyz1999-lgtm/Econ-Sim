@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from backend.app.core.data import BalanceConfig
+from backend.app.core.data import BalanceConfig, load_policies
 from backend.app.domain.common import quantize_quantity
 from backend.app.domain.population import AgeCohortId
 from backend.app.domain.production import SectorId
@@ -8,6 +8,8 @@ from backend.app.domain.reports import (
     Cause,
     GovernmentTurnResult,
     MetricExplanation,
+    PolicyTurnResult,
+    PoliticsTurnResult,
     PopulationTurnResult,
     ResourceTurnResult,
     TurnReport,
@@ -20,6 +22,8 @@ from backend.app.engine.explanations import build_explanations
 from backend.app.engine.government import resolve_government
 from backend.app.engine.infrastructure import resolve_infrastructure
 from backend.app.engine.labor import resolve_labor
+from backend.app.engine.policies import resolve_policies
+from backend.app.engine.politics import resolve_politics
 from backend.app.engine.population import resolve_population
 from backend.app.engine.pricing import update_prices
 from backend.app.engine.production import resolve_production
@@ -28,6 +32,16 @@ from backend.app.engine.production import resolve_production
 def resolve_turn(
     state: GameState, actions: PlayerActions, balance: BalanceConfig
 ) -> tuple[GameState, TurnReport]:
+    """Resolve one deterministic year and return a new immutable state and report."""
+    catalog = load_policies()
+    policy = resolve_policies(
+        state.policies,
+        state.government,
+        state.population,
+        actions.policy_adoption,
+        state.turn + 1,
+        catalog,
+    )
     labor = resolve_labor(actions.labor_allocation, state.population, balance)
     allocated_sectors = {
         sector_id: sector.model_copy(
@@ -55,7 +69,7 @@ def resolve_turn(
         update={"groups": needs_groups}
     )
     government = resolve_government(
-        state.government,
+        policy.government,
         population_for_finance,
         actions.government,
         actions.labor_allocation,
@@ -76,6 +90,18 @@ def resolve_turn(
         food.shortage_ratio,
         labor.child_exposure,
         labor.elderly_exposure,
+        balance,
+    )
+    politics = resolve_politics(
+        state.politics,
+        demographics.population,
+        infrastructure.government,
+        priced_resources,
+        infrastructure.sectors,
+        production.results,
+        policy.policies,
+        policy.reactions,
+        catalog,
         balance,
     )
     next_available_labor = quantize_quantity(
@@ -110,6 +136,7 @@ def resolve_turn(
             "infrastructure maintenance coverage: "
             f"{infrastructure.maintenance_coverage}"
         )
+    warnings.extend(politics.warnings)
     explanations = list(build_explanations(priced_resources, production.results))
     explanations.extend(
         [
@@ -145,6 +172,73 @@ def resolve_turn(
             ),
         ]
     )
+    explanations.extend(
+        [
+            MetricExplanation(
+                metric="government.legitimacy",
+                causes=(
+                    Cause(
+                        code="group_satisfaction",
+                        value=sum(
+                            (
+                                group.satisfaction * group.influence
+                                for group in politics.politics.groups.values()
+                            ),
+                            Decimal(0),
+                        ),
+                        message=(
+                            "Influence-weighted group satisfaction supported legitimacy"
+                        ),
+                    ),
+                    Cause(
+                        code="systemic_strain",
+                        value=politics.politics.systemic_strain,
+                        message="Systemic strain weakened government legitimacy",
+                    ),
+                    Cause(
+                        code="resilience",
+                        value=politics.politics.resilience,
+                        message="Institutional resilience supported legitimacy",
+                    ),
+                ),
+            ),
+            MetricExplanation(
+                metric="politics.systemic_strain",
+                causes=tuple(
+                    Cause(
+                        code=name,
+                        value=value,
+                        message=(
+                            f"{name.replace('_', ' ').title()} contributed pressure"
+                        ),
+                    )
+                    for name, value in politics.politics.components
+                    if value > 0
+                ),
+            ),
+        ]
+    )
+    if policy.adopted_policy is not None:
+        definition = catalog[policy.adopted_policy]
+        explanations.append(
+            MetricExplanation(
+                metric="policies.adoption",
+                causes=(
+                    Cause(
+                        code="implementation_cost",
+                        value=definition.implementation_cost,
+                        message=f"{definition.name} consumed treasury during adoption",
+                    ),
+                    Cause(
+                        code="administrative_load",
+                        value=definition.administrative_load,
+                        message=(
+                            f"{definition.name} added continuing institutional load"
+                        ),
+                    ),
+                ),
+            )
+        )
     next_state = state.model_copy(
         update={
             "turn": state.turn + 1,
@@ -152,7 +246,9 @@ def resolve_turn(
             "resources": priced_resources,
             "sectors": infrastructure.sectors,
             "population": demographics.population,
-            "government": infrastructure.government,
+            "government": politics.government,
+            "policies": policy.policies,
+            "politics": politics.politics,
         }
     )
     working_assigned = labor.assigned_by_cohort[AgeCohortId.WORKING_AGE]
@@ -188,6 +284,21 @@ def resolve_turn(
             infrastructure=infrastructure.government.infrastructure,
             infrastructure_depreciation=infrastructure.depreciation,
             infrastructure_added=infrastructure.infrastructure_added,
+            legitimacy=politics.government.legitimacy,
+            administrative_capacity=politics.government.administrative_capacity,
+        ),
+        policy=PolicyTurnResult(
+            adopted_policy=policy.adopted_policy,
+            activated_policy=policy.activated_policy,
+            active=policy.policies.active,
+        ),
+        politics=PoliticsTurnResult(
+            systemic_strain=politics.politics.systemic_strain,
+            warning_level=politics.politics.warning_level,
+            polarization=politics.politics.polarization,
+            resilience=politics.politics.resilience,
+            environmental_damage=politics.politics.environmental_damage,
+            components=politics.politics.components,
         ),
         warnings=tuple(warnings),
         explanations=tuple(explanations),

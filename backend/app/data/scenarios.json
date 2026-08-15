@@ -1,6 +1,6 @@
 {
   "agrarian_start": {
-    "schema_version": 2,
+    "schema_version": 3,
     "turn": 0,
     "available_labor": "100",
     "resources": {
@@ -36,6 +36,32 @@
       "legitimacy": "0.50",
       "infrastructure": "50",
       "infrastructure_condition": "1"
+    },
+    "policies": {
+      "active": {
+        "exchange": "barter",
+        "property": "communal_property",
+        "trade": "restricted_trade",
+        "taxation": "tribute",
+        "labor": "unregulated_labor",
+        "welfare": "no_welfare",
+        "resource": "unrestricted_extraction"
+      },
+      "adoption_history": []
+    },
+    "politics": {
+      "groups": {
+        "farmers": {"expectations":"0.45","satisfaction":"0.55","organization":"0.15","influence":"0.40","radicalization":"0.05"},
+        "workers": {"expectations":"0.50","satisfaction":"0.50","organization":"0.18","influence":"0.25","radicalization":"0.06"},
+        "owners": {"expectations":"0.65","satisfaction":"0.62","organization":"0.30","influence":"0.22","radicalization":"0.03"},
+        "admins": {"expectations":"0.55","satisfaction":"0.55","organization":"0.25","influence":"0.13","radicalization":"0.03"}
+      },
+      "systemic_strain":"0.20",
+      "components":{"resource_stress":"0","demographic_stress":"0.25","inequality":"0.35","unmet_expectations":"0","infrastructure_burden":"0","debt_pressure":"0","environmental_damage":"0.05","foreign_dependence":"0","institutional_complexity":"0.10","political_polarization":"0.10"},
+      "polarization":"0.10",
+      "resilience":"0.35",
+      "environmental_damage":"0.05",
+      "warning_level":"stable"
     },
     "sectors": {
       "agriculture": {"assigned_labor": "45", "capacity": "100", "productivity": "1.8", "input_coefficients": {"energy": "0.10"}, "output_mix": {"food": "1"}, "wage": "1", "maintenance_requirement": "2", "pollution_intensity": "0.05"},

@@ -3,6 +3,8 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.app.domain.government import GovernmentActions
+from backend.app.domain.policies import PolicyAdoption, PolicyState
+from backend.app.domain.politics import PoliticsState
 from backend.app.domain.population import AgeCohortId, PopulationGroupId
 from backend.app.domain.production import SectorId
 from backend.app.domain.reports import TurnReport
@@ -13,6 +15,8 @@ from backend.app.schemas.population import PopulationSummary
 
 
 class EndTurnRequest(BaseModel):
+    """Validate all choices submitted for one atomic annual turn."""
+
     model_config = ConfigDict(extra="forbid")
 
     expected_turn: int = Field(ge=0)
@@ -20,6 +24,7 @@ class EndTurnRequest(BaseModel):
         SectorId, dict[PopulationGroupId, dict[AgeCohortId, Decimal]]
     ]
     government: GovernmentActions
+    policy_adoption: PolicyAdoption | None = None
 
 
 class DashboardResource(BaseModel):
@@ -39,6 +44,8 @@ class DashboardSector(BaseModel):
 
 
 class DashboardSummary(BaseModel):
+    """Provide a compact backend projection for a future dashboard."""
+
     turn: int
     available_labor: Decimal
     assigned_labor: Decimal
@@ -47,6 +54,8 @@ class DashboardSummary(BaseModel):
     sectors: dict[SectorId, DashboardSector]
     population: PopulationSummary
     government: GovernmentSummary
+    policies: PolicyState
+    politics: PoliticsState
     warnings: tuple[str, ...]
 
 
@@ -57,6 +66,7 @@ class EndTurnResponse(BaseModel):
 
 
 def build_dashboard(state: GameState, report: TurnReport) -> DashboardSummary:
+    """Project a completed state and report into dashboard-ready data."""
     return DashboardSummary(
         turn=state.turn,
         available_labor=state.available_labor,
@@ -107,6 +117,10 @@ def build_dashboard(state: GameState, report: TurnReport) -> DashboardSummary:
             debt_service=state.government.debt_service,
             infrastructure=state.government.infrastructure,
             infrastructure_condition=state.government.infrastructure_condition,
+            legitimacy=state.government.legitimacy,
+            administrative_capacity=state.government.administrative_capacity,
         ),
+        policies=state.policies,
+        politics=state.politics,
         warnings=report.warnings,
     )

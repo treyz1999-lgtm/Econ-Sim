@@ -113,6 +113,19 @@ end-turn request eventually contains labor allocation, budget, trade orders,
 investment, and a crisis response. Its response includes new state, a turn
 report, explanations, warnings, and game-over status.
 
+## Milestone 3 policy boundary
+
+Policy adoption is part of `PlayerActions` submitted to the end-turn endpoint,
+so costs, reactions, simulation resolution, reports, and persistence share one
+atomic transaction. `GET /api/campaigns/{campaign_id}/policies` is a read-only
+catalog projection reporting active policies, transitions, and blockers. A
+separate mutating adoption endpoint is deferred to avoid a second non-atomic
+simulation path.
+
+`PolicyState` and `PoliticsState` are pure domain snapshots. Eligibility and
+political formulas live in engine modules; routes coordinate validated inputs
+and persistence. Definitions and tunable values are loaded from checked-in JSON.
+
 ## Testing architecture
 
 - Unit tests for formulas and state transitions.
@@ -122,4 +135,3 @@ report, explanations, warnings, and game-over status.
 - Soak tests of 500–2,000 automated turns for stability and balance.
 
 Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)
-

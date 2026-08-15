@@ -10,16 +10,21 @@ from backend.app.persistence.models import CampaignModel, TurnSnapshotModel
 
 
 class CampaignNotFoundError(LookupError):
+    """Signal that a requested campaign does not exist."""
+
     pass
 
 
 class StaleTurnError(RuntimeError):
+    """Signal optimistic-concurrency failure during an atomic turn."""
+
     pass
 
 
 def create_campaign(
     session: Session, seed: int, scenario_id: str = "agrarian_start"
 ) -> GameState:
+    """Create a campaign and its immutable turn-zero snapshot."""
     campaign_id = uuid4()
     state = load_scenario(str(campaign_id), seed, scenario_id)
     encoded_state = state.model_dump(mode="json")
@@ -45,17 +50,26 @@ def create_campaign(
 
 
 def get_campaign_state(session: Session, campaign_id: UUID) -> GameState:
+    """Load current state and deterministically upgrade older snapshot schemas."""
     campaign = session.get(CampaignModel, str(campaign_id))
     if campaign is None:
         raise CampaignNotFoundError(str(campaign_id))
     payload = dict(campaign.current_state)
+    baseline = load_scenario(campaign.id, campaign.seed, campaign.scenario_id)
     if payload.get("schema_version", 1) < 2 or "population" not in payload:
-        baseline = load_scenario(campaign.id, campaign.seed, campaign.scenario_id)
         payload.update(
             {
                 "schema_version": 2,
                 "population": baseline.population.model_dump(mode="json"),
                 "government": baseline.government.model_dump(mode="json"),
+            }
+        )
+    if payload.get("schema_version", 2) < 3 or "policies" not in payload:
+        payload.update(
+            {
+                "schema_version": 3,
+                "policies": baseline.policies.model_dump(mode="json"),
+                "politics": baseline.politics.model_dump(mode="json"),
             }
         )
     return GameState.model_validate(payload)
@@ -67,6 +81,7 @@ def save_completed_turn(
     state: GameState,
     report: TurnReport,
 ) -> None:
+    """Persist a state/report snapshot and advance the campaign atomically."""
     encoded_state = state.model_dump(mode="json")
     encoded_report = report.model_dump(mode="json")
     result = session.execute(

@@ -4,6 +4,8 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from backend.app.domain.government import GovernmentActions, GovernmentState
+from backend.app.domain.policies import PolicyAdoption, PolicyState
+from backend.app.domain.politics import PoliticsState
 from backend.app.domain.population import (
     AgeCohortId,
     PopulationGroupId,
@@ -14,12 +16,15 @@ from backend.app.domain.resources import ResourceId, ResourceState
 
 
 class PlayerActions(BaseModel):
+    """Collect all player choices resolved atomically by the turn engine."""
+
     model_config = ConfigDict(frozen=True)
 
     labor_allocation: dict[
         SectorId, dict[PopulationGroupId, dict[AgeCohortId, Decimal]]
     ]
     government: GovernmentActions
+    policy_adoption: PolicyAdoption | None = None
 
     @model_validator(mode="after")
     def require_all_sectors(self) -> "PlayerActions":
@@ -35,9 +40,11 @@ class PlayerActions(BaseModel):
 
 
 class GameState(BaseModel):
+    """Represent the complete deterministic snapshot consumed by the engine."""
+
     model_config = ConfigDict(frozen=True)
 
-    schema_version: int = Field(default=2, ge=2)
+    schema_version: int = Field(default=3, ge=3)
     campaign_id: UUID
     scenario_id: str
     seed: int
@@ -47,6 +54,8 @@ class GameState(BaseModel):
     sectors: dict[SectorId, SectorState]
     population: PopulationState
     government: GovernmentState
+    policies: PolicyState
+    politics: PoliticsState
 
     @model_validator(mode="after")
     def require_complete_economy(self) -> "GameState":

@@ -302,4 +302,59 @@ funded_construction = min(construction_output,
 Funded construction is divided between infrastructure and sector capacity by
 player-selected shares that sum to one.
 
+## Milestone 3 formula specification
+
+The seven institutional dimensions each have exactly one active policy.
+Adoption is an optional end-turn action and is limited to one policy per turn.
+Implementation cost is paid immediately. A delayed policy becomes active on
+its configured activation turn; a pending transition prevents another adoption.
+
+All political metrics use `Decimal`, are rounded half-to-even to four decimal
+places at state boundaries, and are clamped to `[0, 1]`.
+
+```text
+satisfaction_target = clamp(
+    0, 1,
+    0.25 + 0.55 * needs_fulfillment
+    + active_policy_satisfaction + adoption_reaction
+    - 0.12 * child_labor_exposure
+    - 0.08 * elderly_labor_exposure
+    - 0.15 * tax_rate,
+)
+next_satisfaction = satisfaction
+    + satisfaction_adjustment_rate * (target - satisfaction)
+```
+
+Expectations approach satisfaction faster when conditions improve than when
+they deteriorate. Organization rises with grievance and decays slowly with
+satisfaction. Radicalization rises only above the configured grievance
+threshold and in proportion to organization; recovery is slower.
+
+Influence combines population share (35%), income share (20%), wealth share
+(25%), and organization (20%). Administrators receive a 0.10 role bonus before
+all four scores are normalized to sum to one.
+
+Administrative spending builds capacity with diminishing returns:
+
+```text
+administration_coverage = min(1, administration_spending / max(0.05 * population, 1))
+next_capacity = capacity
+    + capacity_gain_rate * administration_coverage * (1 - capacity)
+```
+
+```text
+pollution = sum(sector_output * sector_pollution_intensity)
+next_environmental_damage = clamp(
+    0, 1,
+    prior_damage * (1 - recovery_rate)
+    + pollution * damage_rate * (1 + resource_policy_modifier),
+)
+```
+
+Systemic strain is the configured weighted sum of resource, demographic,
+inequality, expectation, infrastructure, debt, environmental, institutional,
+and political stresses. Legitimacy and resilience reduce the result. Foreign
+dependence is zero until Milestone 4. Warning bands begin at 0.45 (elevated),
+0.65 (severe), and 0.80 (critical); they do not start crisis countdowns.
+
 Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)
