@@ -72,13 +72,18 @@ needs fulfillment, satisfaction, organization, influence, and radicalization.
 
 ```text
 next_population = population + births - deaths + net_migration
-available_labor = working_age_population * participation_rate
+safe_workforce = working_age_population * participation_rate
 ```
 
 Population cannot be negative. Fertility responds to affordability, food,
 employment, services, and confidence. Mortality responds to food, pollution,
 and health spending. Migration responds to wages, unemployment, stability, and
 foreign policy. Demographic effects propagate through cohorts with delay.
+
+Players may assign children, working-age adults, and elderly people to any
+sector. Assignments are measured as people while production receives effective
+labor. Child and elderly work is legal but less productive and creates explicit
+demographic costs.
 
 ## Government, infrastructure, and finance
 
@@ -224,5 +229,77 @@ new_price = old_price * price_multiplier
 ```
 
 All coefficients and initial values are stored in backend JSON data files.
+
+## Milestone 2 formula specification
+
+Population is tracked as four socioeconomic groups—farmers, workers, owners,
+and admins—each divided into children, working-age, and elderly cohorts. A
+person may appear in at most one sector assignment per turn.
+
+```text
+effective_labor =
+    assigned_children * 0.40
+  + assigned_working_age * 1.00
+  + assigned_elderly * 0.65
+```
+
+The multipliers are configurable. Child labor reduces education accumulation
+and increases child mortality. Elderly labor increases elderly mortality.
+Health spending mitigates mortality pressure but cannot make cohort labor
+beneficial to mortality.
+
+```text
+child_labor_rate = assigned_children / max(children, 1)
+elderly_labor_rate = assigned_elderly / max(elderly, 1)
+
+education_gain =
+    education_gain_rate
+  * education_spending_coverage
+  * (1 - child_labor_education_penalty * child_labor_rate)
+```
+
+Annual aging uses 18-year and 47-year cohort widths:
+
+```text
+children_aging_out = children / 18
+working_age_aging_out = working_age / 47
+```
+
+Births depend on working-age population and food security. Mortality combines
+base cohort mortality, food-shortage pressure, cohort labor exposure, and
+health-spending mitigation. Rates are clamped to `[0, 1]`, and every flow is
+clamped so population cannot become negative. Migration is deterministic and
+responds to the configured base rate and food shortage.
+
+Resource demand is the sum of configured per-person needs for every
+group/cohort cell. Consumption remains proportionally aggregate during
+Milestone 2; policy-based allocation is deferred.
+
+Government finance uses:
+
+```text
+tax_revenue = taxable_income * tax_rate
+primary_balance = tax_revenue - non_interest_spending
+debt_service = domestic_interest + foreign_interest
+overall_balance = primary_balance - debt_service + new_foreign_borrowing
+domestic_borrowing = max(0, -overall_balance - opening_treasury)
+```
+
+Foreign borrowing increases foreign debt and foreign reserves equally and is
+subject to a configured per-turn limit. Political and creditor consequences are
+deferred to later milestones.
+
+Infrastructure maintenance and investment use:
+
+```text
+maintenance_need = infrastructure * maintenance_cost_per_unit
+maintenance_coverage = min(1, infrastructure_spending / max(maintenance_need, 1))
+depreciation = infrastructure * depreciation_rate * (1 - maintenance_coverage)
+funded_construction = min(construction_output,
+                          remaining_infrastructure_spending / construction_unit_cost)
+```
+
+Funded construction is divided between infrastructure and sector capacity by
+player-selected shares that sum to one.
 
 Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)

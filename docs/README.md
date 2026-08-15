@@ -49,8 +49,12 @@ Invoke-RestMethod -Method Post `
 ```
 
 Complete a turn by posting the campaign's current turn and a labor allocation
-for all five sectors to `/api/campaigns/{campaign_id}/turns`. Interactive API
-documentation is available at `http://127.0.0.1:8000/docs`.
+by sector, socioeconomic group, and age cohort to
+`/api/campaigns/{campaign_id}/turns`. The same request includes tax rate,
+government spending, foreign borrowing, and construction allocation. Children
+and elderly people may be assigned, but the turn report exposes their reduced
+effective labor and demographic consequences. Interactive API documentation is
+available at `http://127.0.0.1:8000/docs`.
 
 Use `ECON_SIM_DATABASE_URL` to override the default
 `sqlite:///./econ_sim.db` database URL.

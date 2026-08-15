@@ -48,7 +48,17 @@ def get_campaign_state(session: Session, campaign_id: UUID) -> GameState:
     campaign = session.get(CampaignModel, str(campaign_id))
     if campaign is None:
         raise CampaignNotFoundError(str(campaign_id))
-    return GameState.model_validate(campaign.current_state)
+    payload = dict(campaign.current_state)
+    if payload.get("schema_version", 1) < 2 or "population" not in payload:
+        baseline = load_scenario(campaign.id, campaign.seed, campaign.scenario_id)
+        payload.update(
+            {
+                "schema_version": 2,
+                "population": baseline.population.model_dump(mode="json"),
+                "government": baseline.government.model_dump(mode="json"),
+            }
+        )
+    return GameState.model_validate(payload)
 
 
 def save_completed_turn(

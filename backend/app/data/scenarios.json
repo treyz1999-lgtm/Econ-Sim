@@ -1,5 +1,6 @@
 {
   "agrarian_start": {
+    "schema_version": 2,
     "turn": 0,
     "available_labor": "100",
     "resources": {
@@ -9,6 +10,32 @@
       "energy": {"inventory": "60", "demand": "25", "price": "2.50", "world_price": "2.50", "strategic_reserve_target": "25"},
       "consumer_goods": {"inventory": "30", "demand": "35", "price": "4.00", "world_price": "4.00", "strategic_reserve_target": "15"},
       "capital_goods": {"inventory": "25", "demand": "10", "price": "6.00", "world_price": "6.00", "strategic_reserve_target": "10"}
+    },
+    "population": {
+      "participation_rate": "0.80",
+      "education_index": "0.25",
+      "groups": {
+        "farmers": {"cohorts": {"children": "30", "working_age": "75", "elderly": "15"}, "income": "0", "wealth": "20", "needs_fulfillment": "1"},
+        "workers": {"cohorts": {"children": "10", "working_age": "25", "elderly": "5"}, "income": "0", "wealth": "8", "needs_fulfillment": "1"},
+        "owners": {"cohorts": {"children": "5", "working_age": "12.5", "elderly": "2.5"}, "income": "0", "wealth": "80", "needs_fulfillment": "1"},
+        "admins": {"cohorts": {"children": "5", "working_age": "12.5", "elderly": "2.5"}, "income": "0", "wealth": "15", "needs_fulfillment": "1"}
+      }
+    },
+    "government": {
+      "tax_rate": "0.10",
+      "tax_revenue": "0",
+      "spending": {"administration": "4", "infrastructure": "5", "education": "3", "welfare": "1", "health": "2", "security": "1", "military_production": "0"},
+      "treasury": "20",
+      "domestic_debt": "0",
+      "foreign_debt": "0",
+      "domestic_interest_rate": "0.04",
+      "foreign_interest_rate": "0.06",
+      "debt_service": "0",
+      "foreign_reserves": "0",
+      "administrative_capacity": "0.20",
+      "legitimacy": "0.50",
+      "infrastructure": "50",
+      "infrastructure_condition": "1"
     },
     "sectors": {
       "agriculture": {"assigned_labor": "45", "capacity": "100", "productivity": "1.8", "input_coefficients": {"energy": "0.10"}, "output_mix": {"food": "1"}, "wage": "1", "maintenance_requirement": "2", "pollution_intensity": "0.05"},

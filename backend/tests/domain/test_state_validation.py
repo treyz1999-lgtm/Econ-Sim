@@ -5,8 +5,10 @@ import pytest
 from pydantic import ValidationError
 
 from backend.app.core.data import load_scenario
+from backend.app.domain.population import AgeCohortId, PopulationGroupId
 from backend.app.domain.production import SectorId
 from backend.app.domain.state import PlayerActions
+from backend.tests.helpers import government_actions
 
 CAMPAIGN_ID = UUID("00000000-0000-0000-0000-000000000001")
 
@@ -19,14 +21,21 @@ def test_scenario_contains_complete_nonnegative_economy() -> None:
     assert all(resource.inventory >= 0 for resource in state.resources.values())
 
 
-def test_actions_require_every_sector() -> None:
-    with pytest.raises(ValidationError):
-        PlayerActions(labor_allocation={SectorId.AGRICULTURE: Decimal("10")})
+def test_actions_allow_partial_sector_maps() -> None:
+    actions = PlayerActions(
+        labor_allocation={SectorId.AGRICULTURE: {}},
+        government=government_actions(),
+    )
+
+    assert set(actions.labor_allocation) == {SectorId.AGRICULTURE}
 
 
 def test_actions_reject_negative_labor() -> None:
-    allocation = {sector_id: Decimal("1") for sector_id in SectorId}
-    allocation[SectorId.ENERGY] = Decimal("-1")
+    allocation = {
+        SectorId.ENERGY: {
+            PopulationGroupId.WORKERS: {AgeCohortId.CHILDREN: Decimal("-1")}
+        }
+    }
 
     with pytest.raises(ValidationError):
-        PlayerActions(labor_allocation=allocation)
+        PlayerActions(labor_allocation=allocation, government=government_actions())

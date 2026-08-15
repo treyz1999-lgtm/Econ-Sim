@@ -1,10 +1,9 @@
 import hashlib
 import json
-from decimal import Decimal
+from copy import deepcopy
 from pathlib import Path
 
 from backend.app.core.data import load_balance, load_scenario
-from backend.app.domain.production import SectorId
 from backend.app.domain.state import GameState, PlayerActions
 from backend.app.engine.turn_engine import resolve_turn
 
@@ -18,18 +17,24 @@ def canonical_digest(model) -> str:
     return hashlib.sha256(canonical.encode()).hexdigest()
 
 
+def deep_merge(target: dict, overrides: dict) -> dict:
+    for key, value in overrides.items():
+        if isinstance(value, dict) and isinstance(target.get(key), dict):
+            deep_merge(target[key], value)
+        else:
+            target[key] = value
+    return target
+
+
 def run_fixture(fixture: dict) -> list[dict]:
     state = load_scenario(
         fixture["campaign_id"], fixture["seed"], fixture["scenario_id"]
     )
     balance = load_balance()
     results = []
-    for raw_action in fixture["actions"]:
-        actions = PlayerActions(
-            labor_allocation={
-                SectorId(key): Decimal(value) for key, value in raw_action.items()
-            }
-        )
+    for turn in fixture["turns"]:
+        raw_action = deep_merge(deepcopy(fixture["base_action"]), turn["overrides"])
+        actions = PlayerActions.model_validate(raw_action)
         state, report = resolve_turn(state, actions, balance)
         results.append(
             {
@@ -45,5 +50,6 @@ def run_fixture(fixture: dict) -> list[dict]:
 def test_golden_seed_matches_reviewed_canonical_digests() -> None:
     fixture = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
 
-    assert run_fixture(fixture) == fixture["expected"]
+    expected = [turn["expected"] for turn in fixture["turns"]]
+    assert run_fixture(fixture) == expected
     assert run_fixture(fixture) == run_fixture(fixture)

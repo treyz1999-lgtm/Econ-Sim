@@ -80,6 +80,27 @@ with rationale and date once agreed.
   canonical state and report JSON. Fixture changes require explicit formula or
   balance review.
 
+## 2026-08-14 — Milestone 2 population and government
+
+- Replace the working-age-only labor ceiling with demographic assignments.
+  Children and elderly people may work in any sector but have lower effective
+  productivity and causal mortality or education costs.
+- Keep `available_labor` as the safe working-age participation reference;
+  production uses separately calculated effective labor.
+- Track farmers, workers, owners, and admins as persistent socioeconomic groups,
+  each containing children, working-age, and elderly cohorts.
+- Derive demand from configurable group/cohort per-person needs.
+- Use deterministic births, deaths, aging, and migration without wall-clock or
+  global random state.
+- Finance deficits beyond treasury with domestic debt. Explicit foreign
+  borrowing increases debt and reserves equally and has a per-turn ceiling.
+- Apply infrastructure spending to maintenance before new construction.
+- Version game state as schema 2. Legacy Milestone 1 campaign state keeps its
+  economic data and deterministically receives the scenario population and
+  government baseline when loaded.
+- Continue storing population and government inside atomic JSON turn snapshots;
+  no relational schema migration is needed.
+
 ## Source
 
 [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15), retrieved 2026-08-13.

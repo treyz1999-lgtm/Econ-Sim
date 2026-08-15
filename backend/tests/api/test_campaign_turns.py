@@ -6,14 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from backend.app.persistence.models import TurnSnapshotModel
-
-LABOR_ALLOCATION = {
-    "agriculture": "45",
-    "extraction": "15",
-    "manufacturing": "20",
-    "construction": "5",
-    "energy": "10",
-}
+from backend.tests.helpers import end_turn_json
 
 
 def request(
@@ -39,13 +32,15 @@ def test_create_campaign_and_complete_turn_atomically(
         asgi_transport,
         "POST",
         f"/api/campaigns/{campaign_id}/turns",
-        json={"expected_turn": 0, "labor_allocation": LABOR_ALLOCATION},
+        json=end_turn_json(0),
     )
 
     assert created.status_code == 201
     assert completed.status_code == 200
     assert completed.json()["state"]["turn"] == 1
     assert completed.json()["dashboard"]["turn"] == 1
+    assert completed.json()["dashboard"]["population"]["total"]
+    assert completed.json()["dashboard"]["government"]["tax_revenue"]
     assert completed.json()["turn_report"]["turn"] == 1
     with session_factory() as session:
         snapshot_count = session.scalar(select(func.count(TurnSnapshotModel.id)))
@@ -63,7 +58,7 @@ def test_stale_turn_is_rejected_without_snapshot(
         asgi_transport,
         "POST",
         f"/api/campaigns/{campaign_id}/turns",
-        json={"expected_turn": 1, "labor_allocation": LABOR_ALLOCATION},
+        json=end_turn_json(1),
     )
 
     assert stale.status_code == 409
@@ -78,13 +73,14 @@ def test_overallocated_turn_is_rejected_without_snapshot(
 ) -> None:
     created = request(asgi_transport, "POST", "/api/campaigns", json={"seed": 42})
     campaign_id = created.json()["state"]["campaign_id"]
-    allocation = {sector: "21" for sector in LABOR_ALLOCATION}
+    payload = end_turn_json(0)
+    payload["labor_allocation"]["agriculture"] = {"farmers": {"children": "31"}}
 
     invalid = request(
         asgi_transport,
         "POST",
         f"/api/campaigns/{campaign_id}/turns",
-        json={"expected_turn": 0, "labor_allocation": allocation},
+        json=payload,
     )
 
     assert invalid.status_code == 422
@@ -100,7 +96,7 @@ def test_unknown_campaign_returns_not_found(
         asgi_transport,
         "POST",
         f"/api/campaigns/{uuid4()}/turns",
-        json={"expected_turn": 0, "labor_allocation": LABOR_ALLOCATION},
+        json=end_turn_json(0),
     )
 
     assert response.status_code == 404

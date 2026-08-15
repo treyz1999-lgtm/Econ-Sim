@@ -4,5 +4,45 @@
   "surplus_pressure_cap": "0.25",
   "price_multiplier_floor": "0.75",
   "price_multiplier_ceiling": "1.50",
-  "shortage_warning_threshold": "0.10"
+  "shortage_warning_threshold": "0.10",
+  "cohort_productivity": {"children": "0.40", "working_age": "1.00", "elderly": "0.65"},
+  "per_capita_demand": {
+    "farmers": {
+      "children": {"food": "0.45", "energy": "0.08", "consumer_goods": "0.10"},
+      "working_age": {"food": "0.55", "energy": "0.12", "consumer_goods": "0.14"},
+      "elderly": {"food": "0.50", "energy": "0.12", "consumer_goods": "0.12"}
+    },
+    "workers": {
+      "children": {"food": "0.45", "energy": "0.10", "consumer_goods": "0.13"},
+      "working_age": {"food": "0.55", "energy": "0.15", "consumer_goods": "0.20"},
+      "elderly": {"food": "0.50", "energy": "0.15", "consumer_goods": "0.17"}
+    },
+    "owners": {
+      "children": {"food": "0.45", "energy": "0.16", "consumer_goods": "0.25"},
+      "working_age": {"food": "0.55", "energy": "0.22", "consumer_goods": "0.35", "capital_goods": "0.02"},
+      "elderly": {"food": "0.50", "energy": "0.22", "consumer_goods": "0.30"}
+    },
+    "admins": {
+      "children": {"food": "0.45", "energy": "0.12", "consumer_goods": "0.16"},
+      "working_age": {"food": "0.55", "energy": "0.18", "consumer_goods": "0.25"},
+      "elderly": {"food": "0.50", "energy": "0.18", "consumer_goods": "0.22"}
+    }
+  },
+  "child_labor_education_penalty": "0.75",
+  "child_labor_mortality_coefficient": "0.02",
+  "elderly_labor_mortality_coefficient": "0.04",
+  "base_birth_rate": "0.025",
+  "base_mortality_rates": {"children": "0.005", "working_age": "0.003", "elderly": "0.06"},
+  "food_shortage_mortality_coefficient": "0.08",
+  "health_mortality_mitigation": "0.03",
+  "base_migration_rate": "0.001",
+  "education_gain_rate": "0.02",
+  "owner_income_share": "0.15",
+  "welfare_transfer_share": "1.00",
+  "foreign_borrowing_limit": "25",
+  "infrastructure_maintenance_cost": "0.10",
+  "infrastructure_depreciation_rate": "0.05",
+  "construction_cost_per_unit": "1.00",
+  "infrastructure_conversion": "1.00",
+  "sector_capacity_conversion": "0.50"
 }

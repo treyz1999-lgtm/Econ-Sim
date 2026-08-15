@@ -4,24 +4,13 @@ from uuid import UUID
 import pytest
 
 from backend.app.core.data import load_balance, load_scenario
+from backend.app.domain.population import AgeCohortId, PopulationGroupId
 from backend.app.domain.production import SectorId
-from backend.app.domain.state import PlayerActions
-from backend.app.engine.allocation import LaborAllocationError
+from backend.app.engine.labor import PopulationAllocationError
 from backend.app.engine.turn_engine import resolve_turn
+from backend.tests.helpers import default_actions
 
 CAMPAIGN_ID = UUID("00000000-0000-0000-0000-000000000001")
-
-
-def default_actions() -> PlayerActions:
-    return PlayerActions(
-        labor_allocation={
-            SectorId.AGRICULTURE: Decimal("45"),
-            SectorId.EXTRACTION: Decimal("15"),
-            SectorId.MANUFACTURING: Decimal("20"),
-            SectorId.CONSTRUCTION: Decimal("5"),
-            SectorId.ENERGY: Decimal("10"),
-        }
-    )
 
 
 def test_turn_is_deterministic_and_does_not_mutate_input() -> None:
@@ -38,12 +27,16 @@ def test_turn_is_deterministic_and_does_not_mutate_input() -> None:
 
 def test_overallocated_turn_fails_before_state_change() -> None:
     state = load_scenario(str(CAMPAIGN_ID), seed=42)
-    allocation = {sector_id: Decimal("21") for sector_id in SectorId}
+    actions = default_actions()
+    allocation = dict(actions.labor_allocation)
+    allocation[SectorId.AGRICULTURE] = {
+        PopulationGroupId.FARMERS: {AgeCohortId.CHILDREN: Decimal("31")}
+    }
 
-    with pytest.raises(LaborAllocationError):
+    with pytest.raises(PopulationAllocationError):
         resolve_turn(
             state,
-            PlayerActions(labor_allocation=allocation),
+            actions.model_copy(update={"labor_allocation": allocation}),
             load_balance(),
         )
 
@@ -58,4 +51,4 @@ def test_report_reconciles_with_resulting_state() -> None:
     for resource_id, result in report.resources.items():
         assert result.ending_inventory == next_state.resources[resource_id].inventory
         assert result.new_price == next_state.resources[resource_id].price
-    assert len(report.explanations) == 11
+    assert len(report.explanations) == 13

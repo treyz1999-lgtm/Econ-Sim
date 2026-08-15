@@ -19,6 +19,25 @@ class BalanceConfig(BaseModel):
     price_multiplier_floor: Decimal = Field(gt=0, allow_inf_nan=False)
     price_multiplier_ceiling: Decimal = Field(gt=0, allow_inf_nan=False)
     shortage_warning_threshold: Decimal = Field(ge=0, le=1, allow_inf_nan=False)
+    cohort_productivity: dict[str, Decimal]
+    per_capita_demand: dict[str, dict[str, dict[str, Decimal]]]
+    child_labor_education_penalty: Decimal = Field(ge=0, le=1)
+    child_labor_mortality_coefficient: Decimal = Field(ge=0, le=1)
+    elderly_labor_mortality_coefficient: Decimal = Field(ge=0, le=1)
+    base_birth_rate: Decimal = Field(ge=0, le=1)
+    base_mortality_rates: dict[str, Decimal]
+    food_shortage_mortality_coefficient: Decimal = Field(ge=0, le=1)
+    health_mortality_mitigation: Decimal = Field(ge=0, le=1)
+    base_migration_rate: Decimal = Field(ge=-1, le=1)
+    education_gain_rate: Decimal = Field(ge=0, le=1)
+    owner_income_share: Decimal = Field(ge=0, le=1)
+    welfare_transfer_share: Decimal = Field(ge=0, le=1)
+    foreign_borrowing_limit: Decimal = Field(ge=0)
+    infrastructure_maintenance_cost: Decimal = Field(ge=0)
+    infrastructure_depreciation_rate: Decimal = Field(ge=0, le=1)
+    construction_cost_per_unit: Decimal = Field(gt=0)
+    infrastructure_conversion: Decimal = Field(ge=0)
+    sector_capacity_conversion: Decimal = Field(ge=0)
 
     @model_validator(mode="after")
     def validate_price_bounds(self) -> "BalanceConfig":

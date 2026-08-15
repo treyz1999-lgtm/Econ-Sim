@@ -2,44 +2,89 @@
   "scenario_id": "agrarian_start",
   "campaign_id": "00000000-0000-0000-0000-000000000001",
   "seed": 42,
-  "actions": [
-    {
-      "agriculture": "45",
-      "extraction": "15",
-      "manufacturing": "20",
-      "construction": "5",
-      "energy": "10"
+  "base_action": {
+    "labor_allocation": {
+      "agriculture": {"farmers": {"working_age": "45"}},
+      "extraction": {
+        "farmers": {"working_age": "10"},
+        "workers": {"working_age": "5"}
+      },
+      "manufacturing": {
+        "workers": {"working_age": "12"},
+        "owners": {"working_age": "8"}
+      },
+      "construction": {"admins": {"working_age": "4"}},
+      "energy": {
+        "workers": {"working_age": "4"},
+        "admins": {"working_age": "5"}
+      }
     },
-    {
-      "agriculture": "50",
-      "extraction": "12",
-      "manufacturing": "18",
-      "construction": "5",
-      "energy": "10"
-    },
-    {
-      "agriculture": "40",
-      "extraction": "20",
-      "manufacturing": "20",
-      "construction": "8",
-      "energy": "12"
+    "government": {
+      "tax_rate": "0.10",
+      "spending": {
+        "administration": "4",
+        "infrastructure": "5",
+        "education": "3",
+        "welfare": "1",
+        "health": "2",
+        "security": "1",
+        "military_production": "0"
+      },
+      "new_foreign_borrowing": "0",
+      "construction_allocation": {"infrastructure": "1"}
     }
-  ],
-  "expected": [
+  },
+  "turns": [
     {
-      "turn": 1,
-      "state_sha256": "47458425c37087bb900a70d7c41b0c6ab0c4c974dd17e024f81088f5f3666a8a",
-      "report_sha256": "bb1b0981a74385d78d6437544a632094841e98ac4a363b22a08e901416037ab2"
+      "overrides": {},
+      "expected": {
+        "turn": 1,
+        "state_sha256": "e6b166be04acb00a039d15039e48cdad99b63467bc1763576c255cd3cf4e3ef8",
+        "report_sha256": "d348854e82df275cf929e200950f39a548779c7f5333302890ffbc5936d2d8f7"
+      }
     },
     {
-      "turn": 2,
-      "state_sha256": "33e66d3e06715d3fdb607f533ac33aa7cc58b753387ea6760cf5b0a0430037f7",
-      "report_sha256": "20beb071f9e688c6fc109983d06fc56beaeff5b74280d3a508c3c16dca81660c"
+      "overrides": {"labor_allocation": {"agriculture": {"farmers": {"children": "2"}}}},
+      "expected": {
+        "turn": 2,
+        "state_sha256": "7cb29399e1ad95ba94263cdb9fa96675d4f20975ad1328923eab1d9ff247a752",
+        "report_sha256": "92104c2b656c87882518de8881afe0f31190d9bc9901296bb5d6236b6cd6e8cb"
+      }
     },
     {
-      "turn": 3,
-      "state_sha256": "dbbeb14456c4ab11c105dabc50db2b3e3627cc81ddac4fd6a3f568a82d458522",
-      "report_sha256": "a0f3a31d9efd7833582d4e3dadc0b2d45ced3a8c63b9da149712128a54717504"
+      "overrides": {"labor_allocation": {"extraction": {"farmers": {"elderly": "2"}}}},
+      "expected": {
+        "turn": 3,
+        "state_sha256": "5c08765ff800c0d710112b2d9d31adcf87281b7457c51d84656d922096a323be",
+        "report_sha256": "ac414f93dd6f3fe1c3ce63e10dda1e5d901354c0cfb8fa83d6f6b238c898bf5b"
+      }
+    },
+    {
+      "overrides": {
+        "labor_allocation": {
+          "agriculture": {"farmers": {"children": "3"}},
+          "energy": {"farmers": {"elderly": "2"}}
+        },
+        "government": {"spending": {"infrastructure": "0", "education": "6", "health": "5"}}
+      },
+      "expected": {
+        "turn": 4,
+        "state_sha256": "11f14608f71bf2a961ae63e7b4b0019e7b9f345f01ffb65fb70075c99f67f431",
+        "report_sha256": "2309b28e3eb4efb3454c82a12c7a9566cc9b1527292e8067b096b3bc2d8c95b9"
+      }
+    },
+    {
+      "overrides": {
+        "government": {
+          "spending": {"administration": "12", "infrastructure": "15"},
+          "new_foreign_borrowing": "5"
+        }
+      },
+      "expected": {
+        "turn": 5,
+        "state_sha256": "a922e90f5a81aeb9ef3436e0bb4a7aebf3bb29e84ad8fb18332276efcc6e0825",
+        "report_sha256": "f2f7b36bccd492ad9f78a607aae4ce2d38c9f369e3ad7cd6de06ba8b906165a0"
+      }
     }
   ]
 }
