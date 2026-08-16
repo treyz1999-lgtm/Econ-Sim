@@ -55,11 +55,29 @@ class BalanceConfig(BaseModel):
     environmental_recovery_rate: Decimal = Field(ge=0, le=1)
     strain_warning_thresholds: dict[str, Decimal]
     strain_weights: dict[str, Decimal]
+    world_price_sensitivity: Decimal = Field(ge=0)
+    import_price_pressure_coefficient: Decimal = Field(ge=0)
+    world_price_floor: Decimal = Field(gt=0)
+    world_price_ceiling: Decimal = Field(gt=0)
+    restricted_trade_multiplier: Decimal = Field(ge=0, le=1)
+    protectionist_trade_multiplier: Decimal = Field(ge=0, le=1)
+    open_trade_multiplier: Decimal = Field(ge=0)
+    trade_trust_gain_rate: Decimal = Field(ge=0, le=1)
+    unmet_trade_trust_penalty: Decimal = Field(ge=0, le=1)
+    escalation_pressure_high: Decimal = Field(ge=0, le=1)
+    escalation_pressure_low: Decimal = Field(ge=0, le=1)
 
     @model_validator(mode="after")
     def validate_price_bounds(self) -> "BalanceConfig":
+        """Validate ordered bounds and normalized systemic-strain weights."""
         if self.price_multiplier_floor > self.price_multiplier_ceiling:
             raise ValueError("price multiplier floor cannot exceed ceiling")
+        if self.world_price_floor > self.world_price_ceiling:
+            raise ValueError("world price floor cannot exceed ceiling")
+        if self.escalation_pressure_low > self.escalation_pressure_high:
+            raise ValueError("escalation pressure thresholds are reversed")
+        if sum(self.strain_weights.values(), Decimal(0)) != Decimal(1):
+            raise ValueError("systemic strain weights must sum to one")
         return self
 
 
@@ -100,6 +118,7 @@ def load_scenario(
     return GameState.model_validate(
         {
             **scenario,
+            "foreign": _load_json("foreign_nations.json")[scenario_id],
             "campaign_id": campaign_id,
             "seed": seed,
             "scenario_id": scenario_id,

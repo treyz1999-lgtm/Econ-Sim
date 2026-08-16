@@ -46,3 +46,23 @@ def test_inventory_at_reserve_target_keeps_price_stable() -> None:
     result = update_prices(resources, load_balance())[ResourceId.FOOD]
 
     assert result.price == food.price
+
+
+def test_costly_imports_add_domestic_price_pressure() -> None:
+    """Import reliance should transmit a positive foreign-price premium."""
+    state = load_scenario(str(CAMPAIGN_ID), seed=42)
+    food = state.resources[ResourceId.FOOD].model_copy(
+        update={
+            "inventory": Decimal("50"),
+            "demand": Decimal("100"),
+            "imports": Decimal("50"),
+            "price": Decimal("1"),
+            "world_price": Decimal("2"),
+            "shortage_ratio": Decimal(0),
+        }
+    )
+    resources = {**state.resources, ResourceId.FOOD: food}
+
+    updated = update_prices(resources, load_balance())
+
+    assert updated[ResourceId.FOOD].price > Decimal("1")

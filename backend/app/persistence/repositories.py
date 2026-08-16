@@ -72,6 +72,13 @@ def get_campaign_state(session: Session, campaign_id: UUID) -> GameState:
                 "politics": baseline.politics.model_dump(mode="json"),
             }
         )
+    if payload.get("schema_version", 3) < 4 or "foreign" not in payload:
+        payload.update(
+            {
+                "schema_version": 4,
+                "foreign": baseline.foreign.model_dump(mode="json"),
+            }
+        )
     return GameState.model_validate(payload)
 
 

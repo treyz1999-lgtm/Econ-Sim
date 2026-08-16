@@ -39,24 +39,27 @@
       "overrides": {"policy_adoption": {"policy_id": "commodity_currency"}},
       "expected": {
         "turn": 1,
-        "state_sha256": "5f14ddec41734296d9426e30215ff482287b958f6796082f7917552db29e8fdf",
-        "report_sha256": "47ead1fb06967b7f09979306c1a44c2ee836a41aebd2e01ca63436cadda2e482"
+        "state_sha256": "cf8f5a04d7fc87723ce8e5ff82e6709709ee7f49924c6988142ce5b517cd81b1",
+        "report_sha256": "b8621e1a77ffbb4a7dec5dd2e42007342ba7fdc737096fb2587be38df22e8f5a"
       }
     },
     {
       "overrides": {"labor_allocation": {"agriculture": {"farmers": {"children": "2"}}}},
       "expected": {
         "turn": 2,
-        "state_sha256": "2d9f67d518ed2ee982dc0d572b822dfb6b92a112c2e46dd0788d1ae42e5abd70",
-        "report_sha256": "041de28d92686a989ae072451a48f97331aa82d6c09666be21b276552fbdb5e8"
+        "state_sha256": "02a80a4dbe4dce0753e1fe1489460e04208c99d5fcb216b7c72cfc13c1895150",
+        "report_sha256": "bb1f4354d1ca130ce58adc3b6e3334bb76f008eba13e79d85313f511bdf80fc0"
       }
     },
     {
-      "overrides": {"labor_allocation": {"extraction": {"farmers": {"elderly": "2"}}}},
+      "overrides": {
+        "labor_allocation": {"extraction": {"farmers": {"elderly": "2"}}},
+        "trade_orders": [{"nation_id":"northreach","exports":{"food":"5"},"imports":{"energy":"1"}}]
+      },
       "expected": {
         "turn": 3,
-        "state_sha256": "29d318913c9531d8874236ef00fd719e2b9dbb85ba06b16acb5575febf3d02f4",
-        "report_sha256": "882ae1c9115e568c16f919ccdac0115b9e4f0cde123f64e04f6322f563732c3e"
+        "state_sha256": "ba5483678abc818c157abe92f4208cbbab99ef6a307bd954ac1f75249babf954",
+        "report_sha256": "378e82c0c45e19dc2e932d608efe48f3ec769f8ae08ccb1f7f3a08260e4b45e3"
       }
     },
     {
@@ -69,8 +72,8 @@
       },
       "expected": {
         "turn": 4,
-        "state_sha256": "4e4282b989f3e130e6de255bcab2989f087724a7b0533a5ea69c5bb10d503363",
-        "report_sha256": "5969b4d88bd59968fb5e9faab30c2021c77aeeb9d07711b775bd87a1fbb54a4c"
+        "state_sha256": "8313d0767140a9efa8ea993c228a1282eea741a2f77434f281faf3082bcb854e",
+        "report_sha256": "4891f3fec92cba31e3f74658025ba4281edbb87d445303f95232b017419805a0"
       }
     },
     {
@@ -82,8 +85,8 @@
       },
       "expected": {
         "turn": 5,
-        "state_sha256": "bc5c4c5185e16537b0c46e434bc894073f3d14e8c2cb4edeb14319e2df7211f9",
-        "report_sha256": "ea835803ec4f83f8b4e868b693b00fe5091862b950055fe60e82422613d2e156"
+        "state_sha256": "af176690b1e7143ecbb9b7688b0120c124ba2f94880fffbc273016debfd74072",
+        "report_sha256": "de46fe971eade8f106dbffa5944f810b4b00abd3adc1a10028ebf3c5ba951348"
       }
     }
   ]

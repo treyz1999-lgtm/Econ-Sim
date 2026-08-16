@@ -109,6 +109,11 @@ Policy and politics UI remains outside the current backend-only scope.
 
 ### Milestone 5 — Crises and defeat
 
+Milestone 4 backend scope includes three configured foreign actors, atomic
+trade orders, reserve settlement, world prices, relationships, debt claims,
+foreign dependence, and non-terminal escalation warnings. Foreign UI and
+Milestone 5 crisis resolution remain outside this increment.
+
 - Five-turn revolution and insolvency crises, abstract invasion,
   essential-resource collapse, and game-over reporting.
 

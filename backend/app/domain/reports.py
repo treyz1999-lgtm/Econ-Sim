@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from backend.app.domain.foreign import EscalationState, ForeignNationId
 from backend.app.domain.government import SpendingCategory
 from backend.app.domain.policies import PolicyDimension
 from backend.app.domain.politics import StrainComponents, WarningLevel
@@ -49,6 +50,10 @@ class ResourceTurnResult(BaseModel):
     shortage_ratio: Decimal = Field(ge=0, le=1, allow_inf_nan=False)
     old_price: Decimal = Field(gt=0, allow_inf_nan=False)
     new_price: Decimal = Field(gt=0, allow_inf_nan=False)
+    imports: Decimal = Field(ge=0, allow_inf_nan=False)
+    exports: Decimal = Field(ge=0, allow_inf_nan=False)
+    old_world_price: Decimal = Field(gt=0, allow_inf_nan=False)
+    new_world_price: Decimal = Field(gt=0, allow_inf_nan=False)
 
 
 class PopulationTurnResult(BaseModel):
@@ -106,6 +111,32 @@ class PoliticsTurnResult(BaseModel):
     components: StrainComponents
 
 
+class NationTradeTurnResult(BaseModel):
+    """Report executed trade and diplomatic state for one foreign nation."""
+
+    model_config = ConfigDict(frozen=True)
+
+    imports: dict[ResourceId, Decimal]
+    exports: dict[ResourceId, Decimal]
+    import_cost: Decimal = Field(ge=0)
+    export_revenue: Decimal = Field(ge=0)
+    trust: Decimal = Field(ge=0, le=1)
+    relations: Decimal = Field(ge=-1, le=1)
+    pressure: Decimal = Field(ge=0, le=1)
+    escalation: EscalationState
+
+
+class ForeignTurnResult(BaseModel):
+    """Summarize trade settlement and foreign dependence for a completed turn."""
+
+    model_config = ConfigDict(frozen=True)
+
+    nations: dict[ForeignNationId, NationTradeTurnResult]
+    total_import_value: Decimal = Field(ge=0)
+    total_export_value: Decimal = Field(ge=0)
+    foreign_dependence: Decimal = Field(ge=0, le=1)
+
+
 class TurnReport(BaseModel):
     """Return reconciled economic, demographic, government, and political results."""
 
@@ -123,5 +154,6 @@ class TurnReport(BaseModel):
     government: GovernmentTurnResult
     policy: PolicyTurnResult
     politics: PoliticsTurnResult
+    foreign: ForeignTurnResult
     warnings: tuple[str, ...]
     explanations: tuple[MetricExplanation, ...]

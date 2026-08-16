@@ -126,6 +126,19 @@ simulation path.
 political formulas live in engine modules; routes coordinate validated inputs
 and persistence. Definitions and tunable values are loaded from checked-in JSON.
 
+## Milestone 4 trade and foreign boundary
+
+Trade orders are part of `PlayerActions` and settle inside the existing atomic
+end-turn transaction. The engine resolves production, trade, consumption,
+prices, government finance, foreign relations, and politics in that order.
+`GET /api/campaigns/{campaign_id}/foreign` is a read-only projection of the
+three persisted foreign actors.
+
+`ForeignState` is a pure domain snapshot. `engine/trade.py` owns inventory and
+reserve settlement; `engine/foreign.py` owns trust, relations, debt claims,
+dependence, pressure, and ordered escalation. Actor baselines and market
+capacity live in `data/foreign_nations.json`; routes contain no trade formulas.
+
 ## Testing architecture
 
 - Unit tests for formulas and state transitions.

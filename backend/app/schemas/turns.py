@@ -1,7 +1,8 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from backend.app.domain.foreign import ForeignState, TradeOrder
 from backend.app.domain.government import GovernmentActions
 from backend.app.domain.policies import PolicyAdoption, PolicyState
 from backend.app.domain.politics import PoliticsState
@@ -25,15 +26,29 @@ class EndTurnRequest(BaseModel):
     ]
     government: GovernmentActions
     policy_adoption: PolicyAdoption | None = None
+    trade_orders: tuple[TradeOrder, ...] = ()
+
+    @model_validator(mode="after")
+    def require_unique_trade_nations(self) -> "EndTurnRequest":
+        """Reject ambiguous duplicate orders during request validation."""
+        nation_ids = [order.nation_id for order in self.trade_orders]
+        if len(nation_ids) != len(set(nation_ids)):
+            raise ValueError("only one trade order is allowed per foreign nation")
+        return self
 
 
 class DashboardResource(BaseModel):
+    """Expose domestic and international resource-market results."""
+
     inventory: Decimal
     production: Decimal
     demand: Decimal
     consumption: Decimal
     shortage_ratio: Decimal
     price: Decimal
+    world_price: Decimal
+    imports: Decimal
+    exports: Decimal
 
 
 class DashboardSector(BaseModel):
@@ -56,6 +71,7 @@ class DashboardSummary(BaseModel):
     government: GovernmentSummary
     policies: PolicyState
     politics: PoliticsState
+    foreign: ForeignState
     warnings: tuple[str, ...]
 
 
@@ -80,6 +96,9 @@ def build_dashboard(state: GameState, report: TurnReport) -> DashboardSummary:
                 consumption=resource.consumption,
                 shortage_ratio=resource.shortage_ratio,
                 price=resource.price,
+                world_price=resource.world_price,
+                imports=resource.imports,
+                exports=resource.exports,
             )
             for resource_id, resource in state.resources.items()
         },
@@ -122,5 +141,6 @@ def build_dashboard(state: GameState, report: TurnReport) -> DashboardSummary:
         ),
         policies=state.policies,
         politics=state.politics,
+        foreign=state.foreign,
         warnings=report.warnings,
     )

@@ -357,4 +357,48 @@ and political stresses. Legitimacy and resilience reduce the result. Foreign
 dependence is zero until Milestone 4. Warning bands begin at 0.45 (elevated),
 0.65 (severe), and 0.80 (critical); they do not start crisis countdowns.
 
+## Milestone 4 formula specification
+
+The initial region contains Northreach Commonwealth, the Mercantile League,
+and the Iron Dominion. Each configured actor exposes annual supply and demand
+for all six resources plus strength, aggressiveness, trust, relations, debt
+claims, strategic interest, trade posture, pressure, and escalation state.
+
+One trade order per nation may request imports and exports. A resource cannot
+be imported and exported to the same nation in one order. Exports settle first,
+allowing their proceeds to fund imports during the same atomic trade stage.
+
+```text
+market_access = trade_policy_multiplier * escalation_multiplier
+executed_export = min(request, foreign_demand * market_access,
+                      max(0, inventory - strategic_reserve_target))
+export_revenue = executed_export * world_price
+executed_import = min(request, foreign_supply * market_access,
+                      foreign_reserves / world_price)
+import_cost = executed_import * world_price
+```
+
+Quantities and reserve settlement use four-decimal `Decimal` arithmetic.
+Imports cannot exceed available foreign reserves or credit, exports cannot make
+inventory negative, and exports preserve the configured strategic reserve.
+
+World prices respond to the three actors' configured supply and demand:
+
+```text
+world_pressure = (foreign_demand - foreign_supply) / max(foreign_supply, 1)
+world_multiplier = clamp(0.90, 1.10,
+                         1 + world_price_sensitivity * world_pressure)
+```
+
+Domestic prices add import pressure when imported goods carry a positive world
+price premium. Actual food and energy imports divided by food and energy demand
+produce foreign dependence, which contributes to systemic strain.
+
+Completed trade improves trust and relations. Unfulfilled orders reduce them.
+Foreign pressure combines aggressiveness, strategic interest, poor relations,
+and debt exposure, reduced by trust. Pressure may advance or reduce escalation
+by at most one ordered state per turn: normal, demands, tariffs, sanctions,
+financial pressure, blockade warning, and invasion warning. Milestone 4 stops
+at warnings; invasion crisis resolution belongs to Milestone 5.
+
 Source: [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15)

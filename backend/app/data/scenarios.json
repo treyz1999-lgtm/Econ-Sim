@@ -1,6 +1,6 @@
 {
   "agrarian_start": {
-    "schema_version": 3,
+    "schema_version": 4,
     "turn": 0,
     "available_labor": "100",
     "resources": {

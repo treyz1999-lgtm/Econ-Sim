@@ -39,6 +39,7 @@ def end_turn(
                 labor_allocation=request.labor_allocation,
                 government=request.government,
                 policy_adoption=request.policy_adoption,
+                trade_orders=request.trade_orders,
             )
             next_state, report = resolve_turn(state, actions, load_balance())
             save_completed_turn(session, state.turn, next_state, report)

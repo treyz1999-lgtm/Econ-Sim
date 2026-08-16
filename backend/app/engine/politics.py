@@ -76,6 +76,7 @@ def resolve_politics(
     sector_results: dict[SectorId, SectorTurnResult],
     policies: PolicyState,
     reactions: dict[PopulationGroupId, Decimal],
+    foreign_dependence: Decimal,
     catalog: dict[str, PolicyDefinition],
     balance: BalanceConfig,
 ) -> PoliticsResolution:
@@ -208,7 +209,7 @@ def resolve_politics(
             government.debt_service / max(government.tax_revenue, ONE)
         ),
         environmental_damage=environmental_damage,
-        foreign_dependence=ZERO,
+        foreign_dependence=_clamp(foreign_dependence),
         institutional_complexity=_clamp(
             active_administrative_load(policies, catalog)
             / max(government.administrative_capacity, Decimal("0.10"))

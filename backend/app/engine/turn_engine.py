@@ -6,8 +6,10 @@ from backend.app.domain.population import AgeCohortId
 from backend.app.domain.production import SectorId
 from backend.app.domain.reports import (
     Cause,
+    ForeignTurnResult,
     GovernmentTurnResult,
     MetricExplanation,
+    NationTradeTurnResult,
     PolicyTurnResult,
     PoliticsTurnResult,
     PopulationTurnResult,
@@ -19,6 +21,7 @@ from backend.app.domain.state import GameState, PlayerActions
 from backend.app.engine.consumption import resolve_consumption
 from backend.app.engine.demand import derive_population_demand
 from backend.app.engine.explanations import build_explanations
+from backend.app.engine.foreign import resolve_foreign_relations
 from backend.app.engine.government import resolve_government
 from backend.app.engine.infrastructure import resolve_infrastructure
 from backend.app.engine.labor import resolve_labor
@@ -27,6 +30,7 @@ from backend.app.engine.politics import resolve_politics
 from backend.app.engine.population import resolve_population
 from backend.app.engine.pricing import update_prices
 from backend.app.engine.production import resolve_production
+from backend.app.engine.trade import resolve_trade
 
 
 def resolve_turn(
@@ -53,7 +57,15 @@ def resolve_turn(
         state.resources, state.population, balance
     )
     production = resolve_production(demanded_resources, allocated_sectors)
-    consumption = resolve_consumption(production.resources)
+    trade = resolve_trade(
+        production.resources,
+        policy.government,
+        state.foreign,
+        policy.policies,
+        actions.trade_orders,
+        balance,
+    )
+    consumption = resolve_consumption(trade.resources)
     priced_resources = update_prices(consumption.resources, balance)
     food = priced_resources[ResourceId.FOOD]
     needs_fulfillment = (
@@ -69,7 +81,7 @@ def resolve_turn(
         update={"groups": needs_groups}
     )
     government = resolve_government(
-        policy.government,
+        trade.government,
         population_for_finance,
         actions.government,
         actions.labor_allocation,
@@ -92,6 +104,22 @@ def resolve_turn(
         labor.elderly_exposure,
         balance,
     )
+    essential_imports = (
+        priced_resources[ResourceId.FOOD].imports
+        + priced_resources[ResourceId.ENERGY].imports
+    )
+    essential_demand = (
+        priced_resources[ResourceId.FOOD].demand
+        + priced_resources[ResourceId.ENERGY].demand
+    )
+    foreign = resolve_foreign_relations(
+        state.foreign,
+        trade.nations,
+        infrastructure.government,
+        essential_imports,
+        essential_demand,
+        balance,
+    )
     politics = resolve_politics(
         state.politics,
         demographics.population,
@@ -101,6 +129,7 @@ def resolve_turn(
         production.results,
         policy.policies,
         policy.reactions,
+        foreign.foreign.foreign_dependence,
         catalog,
         balance,
     )
@@ -119,6 +148,10 @@ def resolve_turn(
             shortage_ratio=priced_resources[resource_id].shortage_ratio,
             old_price=state.resources[resource_id].price,
             new_price=priced_resources[resource_id].price,
+            imports=priced_resources[resource_id].imports,
+            exports=priced_resources[resource_id].exports,
+            old_world_price=state.resources[resource_id].world_price,
+            new_world_price=priced_resources[resource_id].world_price,
         )
         for resource_id in ResourceId
     }
@@ -137,6 +170,7 @@ def resolve_turn(
             f"{infrastructure.maintenance_coverage}"
         )
     warnings.extend(politics.warnings)
+    warnings.extend(foreign.warnings)
     explanations = list(build_explanations(priced_resources, production.results))
     explanations.extend(
         [
@@ -239,6 +273,24 @@ def resolve_turn(
                 ),
             )
         )
+    if trade.total_import_value > 0 or trade.total_export_value > 0:
+        explanations.append(
+            MetricExplanation(
+                metric="foreign.trade_balance",
+                causes=(
+                    Cause(
+                        code="exports",
+                        value=trade.total_export_value,
+                        message="Exports earned foreign reserves",
+                    ),
+                    Cause(
+                        code="imports",
+                        value=-trade.total_import_value,
+                        message="Imports consumed foreign reserves",
+                    ),
+                ),
+            )
+        )
     next_state = state.model_copy(
         update={
             "turn": state.turn + 1,
@@ -249,6 +301,7 @@ def resolve_turn(
             "government": politics.government,
             "policies": policy.policies,
             "politics": politics.politics,
+            "foreign": foreign.foreign,
         }
     )
     working_assigned = labor.assigned_by_cohort[AgeCohortId.WORKING_AGE]
@@ -299,6 +352,24 @@ def resolve_turn(
             resilience=politics.politics.resilience,
             environmental_damage=politics.politics.environmental_damage,
             components=politics.politics.components,
+        ),
+        foreign=ForeignTurnResult(
+            nations={
+                nation_id: NationTradeTurnResult(
+                    imports=trade.nations[nation_id].imports,
+                    exports=trade.nations[nation_id].exports,
+                    import_cost=trade.nations[nation_id].import_cost,
+                    export_revenue=trade.nations[nation_id].export_revenue,
+                    trust=nation.trust,
+                    relations=nation.relations,
+                    pressure=nation.pressure,
+                    escalation=nation.escalation,
+                )
+                for nation_id, nation in foreign.foreign.nations.items()
+            },
+            total_import_value=trade.total_import_value,
+            total_export_value=trade.total_export_value,
+            foreign_dependence=foreign.foreign.foreign_dependence,
         ),
         warnings=tuple(warnings),
         explanations=tuple(explanations),

@@ -1,0 +1,46 @@
+{
+  "agrarian_start": {
+    "foreign_dependence": "0",
+    "nations": {
+      "northreach": {
+        "name": "Northreach Commonwealth",
+        "economic_strength": "0.65",
+        "military_industrial_strength": "0.45",
+        "aggressiveness": "0.20",
+        "trust": "0.60",
+        "relations": "0.35",
+        "import_supply": {"food":"25","timber":"20","ore":"10","energy":"18","consumer_goods":"12","capital_goods":"8"},
+        "export_demand": {"food":"15","timber":"12","ore":"8","energy":"5","consumer_goods":"10","capital_goods":"5"},
+        "trade_posture": "cooperative",
+        "debt_claims": "0",
+        "strategic_interest": "0.30"
+      },
+      "mercantile_league": {
+        "name": "Mercantile League",
+        "economic_strength": "0.85",
+        "military_industrial_strength": "0.50",
+        "aggressiveness": "0.35",
+        "trust": "0.45",
+        "relations": "0.10",
+        "import_supply": {"food":"12","timber":"8","ore":"15","energy":"25","consumer_goods":"30","capital_goods":"24"},
+        "export_demand": {"food":"20","timber":"18","ore":"20","energy":"8","consumer_goods":"12","capital_goods":"10"},
+        "trade_posture": "mercantile",
+        "debt_claims": "0",
+        "strategic_interest": "0.55"
+      },
+      "iron_dominion": {
+        "name": "Iron Dominion",
+        "economic_strength": "0.75",
+        "military_industrial_strength": "0.90",
+        "aggressiveness": "0.75",
+        "trust": "0.25",
+        "relations": "-0.15",
+        "import_supply": {"food":"5","timber":"10","ore":"30","energy":"35","consumer_goods":"8","capital_goods":"18"},
+        "export_demand": {"food":"25","timber":"20","ore":"5","energy":"5","consumer_goods":"18","capital_goods":"14"},
+        "trade_posture": "coercive",
+        "debt_claims": "0",
+        "strategic_interest": "0.80"
+      }
+    }
+  }
+}

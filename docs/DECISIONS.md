@@ -118,6 +118,23 @@ with rationale and date once agreed.
 - Version game state as schema 3. Older snapshots receive deterministic policy
   and politics baselines without a relational database migration.
 
+## 2026-08-16 — Milestone 4 trade and foreign nations
+
+- Configure exactly three simplified foreign actors rather than simulating
+  autonomous foreign economies or detailed supply chains.
+- Resolve exports before imports so same-turn export earnings can fund imports;
+  preserve strategic reserves and forbid imports beyond reserves or credit.
+- Apply active trade-policy and escalation multipliers to market access, making
+  institutions and diplomatic pressure economically consequential.
+- Move world prices deterministically from configured regional supply and demand
+  with a capped per-turn multiplier.
+- Derive foreign dependence from actual essential-resource imports and include
+  it in systemic strain.
+- Advance or recover escalation by at most one ordered state per turn. Blockade
+  and invasion remain warnings; crisis countdowns begin only in Milestone 5.
+- Version game state as schema 4 and deterministically add the three actor
+  baseline to older JSON snapshots without a relational migration.
+
 ## Source
 
 [Economic Simulator — MVP Product & Engineering Plan](https://app.notion.com/p/3b988d2fa3f381f7a832e2b687d12d15), retrieved 2026-08-13.

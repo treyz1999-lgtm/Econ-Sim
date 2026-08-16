@@ -6,12 +6,14 @@ from backend.app.domain.resources import ResourceId, ResourceState
 
 
 def clamp(minimum: Decimal, maximum: Decimal, value: Decimal) -> Decimal:
+    """Constrain one price multiplier to configured stability bounds."""
     return max(minimum, min(maximum, value))
 
 
 def update_prices(
     resources: dict[ResourceId, ResourceState], balance: BalanceConfig
 ) -> dict[ResourceId, ResourceState]:
+    """Update domestic prices from shortages, imports, and excess inventory."""
     shortage_coefficient = balance.shortage_pressure_coefficient
     surplus_coefficient = balance.surplus_pressure_coefficient
     surplus_cap = balance.surplus_pressure_cap
@@ -21,6 +23,13 @@ def update_prices(
     updated: dict[ResourceId, ResourceState] = {}
     for resource_id, resource in resources.items():
         shortage_pressure = resource.shortage_ratio * shortage_coefficient
+        import_share = resource.imports / max(resource.demand, Decimal(1))
+        foreign_premium = max(
+            Decimal(0), resource.world_price / resource.price - Decimal(1)
+        )
+        import_pressure = (
+            import_share * foreign_premium * balance.import_price_pressure_coefficient
+        )
         surplus_ratio = max(
             Decimal(0),
             resource.inventory - resource.strategic_reserve_target,
@@ -29,7 +38,7 @@ def update_prices(
         multiplier = clamp(
             multiplier_floor,
             multiplier_ceiling,
-            Decimal(1) + shortage_pressure - surplus_pressure,
+            Decimal(1) + shortage_pressure + import_pressure - surplus_pressure,
         )
         updated[resource_id] = resource.model_copy(
             update={"price": quantize_price(resource.price * multiplier)}

@@ -58,5 +58,16 @@
   "environmental_damage_rate": "0.001",
   "environmental_recovery_rate": "0.015",
   "strain_warning_thresholds": {"elevated":"0.45","severe":"0.65","critical":"0.80"},
-  "strain_weights": {"resource_stress":"0.15","demographic_stress":"0.08","inequality":"0.10","unmet_expectations":"0.14","infrastructure_burden":"0.10","debt_pressure":"0.10","environmental_damage":"0.10","foreign_dependence":"0.00","institutional_complexity":"0.10","political_polarization":"0.13"}
+  "strain_weights": {"resource_stress":"0.14","demographic_stress":"0.08","inequality":"0.10","unmet_expectations":"0.13","infrastructure_burden":"0.09","debt_pressure":"0.10","environmental_damage":"0.09","foreign_dependence":"0.08","institutional_complexity":"0.09","political_polarization":"0.10"},
+  "world_price_sensitivity": "0.08",
+  "import_price_pressure_coefficient": "0.20",
+  "world_price_floor": "0.90",
+  "world_price_ceiling": "1.10",
+  "restricted_trade_multiplier": "0.20",
+  "protectionist_trade_multiplier": "0.60",
+  "open_trade_multiplier": "1.00",
+  "trade_trust_gain_rate": "0.03",
+  "unmet_trade_trust_penalty": "0.02",
+  "escalation_pressure_high": "0.55",
+  "escalation_pressure_low": "0.25"
 }

@@ -22,6 +22,7 @@ def _resolve(state, population=None, government=None):
         production.results,
         state.policies,
         {group: Decimal(0) for group in PopulationGroupId},
+        Decimal(0),
         load_policies(),
         load_balance(),
     )
@@ -80,6 +81,7 @@ def test_shortage_and_vulnerable_labor_reduce_satisfaction() -> None:
         production.results,
         state.policies,
         {group: Decimal(0) for group in PopulationGroupId},
+        Decimal(0),
         load_policies(),
         load_balance(),
     )
@@ -114,6 +116,7 @@ def test_environmental_damage_responds_to_resource_policy() -> None:
         production.results,
         conservation_policies,
         {group: Decimal(0) for group in PopulationGroupId},
+        Decimal(0),
         load_policies(),
         load_balance(),
     )
